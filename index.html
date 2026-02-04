@@ -113,11 +113,11 @@
         If some of these don't have the Movie's Anywhere link then you'll have to buy it on Amazon or you can click on the google link or youtube to watch it
     </div>
 
-    <div id="movie-container">Syncing Cinema Library...</div>
+    <div id="movie-container">Direct-Linking Images...</div>
 
     <script>
         // 🚀 SMART CACHE: Appending a timestamp to the CSV URL forces a fresh fetch from Google Sheets
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&cache=' + Date.now();
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
         const githubBase = 'https://raw.githubusercontent.com/KFruti88/Movies-Anywhere/main/images/';
 
         function init() {
@@ -135,14 +135,19 @@
         function fixImageUrl(url) {
             if (!url || url.trim() === "") return '';
             let clean = url.trim();
+
+            // 1. If it's just a filename (no http), add the full GitHub path
             if (!clean.startsWith('http')) {
                 clean = githubBase + clean;
             }
+
+            // 2. UNIVERSAL GITHUB FIX: Force all GitHub URLs to use the raw delivery network
+            // This handles "github.com", "/blob/", and "/tree/" links automatically
             clean = clean.replace('github.com', 'raw.githubusercontent.com')
                          .replace('/blob/', '/')
                          .replace('/tree/', '/');
             
-            // 🚀 SMART CACHE: Appending a timestamp to image URLs forces a fresh fetch from GitHub
+            // 3. 🚀 SMART CACHE: Append a timestamp so changes show up instantly
             return clean + '?v=' + Date.now();
         }
 
@@ -160,7 +165,7 @@
                 card.className = 'movie-card';
                 card.innerHTML = `
                     <div class="poster-box">
-                        <img src="${fixImageUrl(row['Movie Image'])}" alt="${name}" class="poster" onerror="this.src='https://via.placeholder.com/400x600?text=Error'">
+                        <img src="${fixImageUrl(row['Movie Image'])}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/000/fff?text=Check+Image+Path'">
                     </div>
                     <div class="card-content">
                         <div class="title">${name}</div>
