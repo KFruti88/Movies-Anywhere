@@ -116,7 +116,8 @@
     <div id="movie-container">Syncing Cinema Library...</div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv';
+        // 🚀 SMART CACHE: Appending a timestamp to the CSV URL forces a fresh fetch from Google Sheets
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&cache=' + Date.now();
         const githubBase = 'https://raw.githubusercontent.com/KFruti88/Movies-Anywhere/main/images/';
 
         function init() {
@@ -125,9 +126,7 @@
                 complete: function(results) { 
                     // Permanent A-Z Sort Logic
                     let sortedData = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
-                    
                     sortedData.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
-
                     renderMovies(sortedData); 
                 }
             });
@@ -142,6 +141,8 @@
             clean = clean.replace('github.com', 'raw.githubusercontent.com')
                          .replace('/blob/', '/')
                          .replace('/tree/', '/');
+            
+            // 🚀 SMART CACHE: Appending a timestamp to image URLs forces a fresh fetch from GitHub
             return clean + '?v=' + Date.now();
         }
 
