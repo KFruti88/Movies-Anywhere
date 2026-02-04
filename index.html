@@ -6,58 +6,59 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies Anywhere | Universal Wide Library</title>
+    <title>Movies Anywhere | Premium Hybrid Library</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
-        /* Color Lock: Clay County & Movies Anywhere Standards */
+        /* Hybrid Branding Color Lock */
         :root {
-            --bg-card: #333333; /* Charcoal */
-            --text-main: #ffffff; /* White */
+            --bg-main: #080808; 
+            --bg-card: #161616; 
+            --text-main: #ffffff;
             --amazon-orange: #ff9900;
             --yt-red: #ff0000;
             --ma-blue: #0099ff;
             --goog-blue: #4285f4;
+            --goog-green: #34a853;
         }
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: transparent; 
+            background-color: var(--bg-main);
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 🛠️ UNIVERSAL WIDE FIX: 90% Box Size with High-Density Grid */
+        /* 🛠️ UNIVERSAL WIDE FIX: High-Density Expansion */
         #movie-container {
             width: 90% !important; 
             max-width: 2800px; 
             display: grid;
-            /* Fills as many cards as possible horizontally for Ultra-Wide/TV */
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
             gap: 20px;
             margin-top: 30px;
+            margin-bottom: 60px;
         }
 
+        /* Glossy Hybrid Card Styling */
         .movie-card {
-            background-color: var(--bg-card);
-            border: 1px solid #444;
-            border-radius: 12px;
+            background: linear-gradient(145deg, #1e1e1e, #111111);
+            border: 1px solid #333;
+            border-radius: 14px;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease, border-color 0.3s;
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
         }
 
+        /* Hover Effect: Glow mix of MA Blue and Amazon Orange */
         .movie-card:hover { 
-            transform: translateY(-8px); 
+            transform: scale(1.05) translateY(-10px); 
             border-color: var(--ma-blue);
+            box-shadow: 0 15px 35px rgba(0, 153, 255, 0.3), 0 0 15px rgba(255, 153, 0, 0.2);
         }
 
         .poster {
@@ -65,61 +66,72 @@
             aspect-ratio: 2/3;
             object-fit: cover;
             background-color: #000;
+            border-bottom: 2px solid #222;
         }
 
         .card-content {
             padding: 15px;
             text-align: center;
-            background: #222;
+            background: rgba(20, 20, 20, 0.95);
         }
 
         .title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 12px;
             min-height: 2.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             line-height: 1.2;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
         }
 
-        /* Button Grid: Buttons will hide if URL is missing */
+        /* Button Grid: Hidden if URL is missing */
         .link-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn {
-            padding: 8px 2px;
+            padding: 7px 2px;
             text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
+            border-radius: 5px;
+            font-size: 0.65rem;
+            font-weight: 800;
             color: white;
             text-align: center;
             text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: opacity 0.2s;
         }
 
-        .btn-amazon { background-color: var(--amazon-orange); color: #000; }
-        .btn-google { background-color: var(--goog-blue); }
-        .btn-youtube { background-color: var(--yt-red); }
-        .btn-ma { background-color: var(--ma-blue); }
+        .btn:hover { opacity: 0.85; }
 
-        /* Mobile Stacking Standard */
+        .btn-amazon { background: linear-gradient(to bottom, #ff9900, #e47911); color: #000; }
+        .btn-google { background: linear-gradient(to bottom, var(--goog-blue), #3b78db); }
+        .btn-youtube { background: linear-gradient(to bottom, #ff0000, #cc0000); }
+        .btn-ma { background: linear-gradient(to bottom, var(--ma-blue), #007acc); }
+
+        /* Ultra-Wide Adjustment */
+        @media (min-width: 2000px) {
+            #movie-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+        }
+
+        /* Mobile Standard */
         @media (max-width: 768px) {
-            #movie-container { 
-                width: 95% !important; 
-                grid-template-columns: repeat(2, 1fr); 
-            }
+            #movie-container { width: 95% !important; grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
 
-    <h1 style="color: var(--ma-blue); text-transform: uppercase; letter-spacing: 2px; margin-top: 40px;">Movie-s-Anywhere Library</h1>
-    <div id="movie-container">Syncing Universal Library...</div>
+    <h1 style="margin-top: 40px; font-size: 2.5rem; text-align: center; font-weight: 900; letter-spacing: -1px;">
+        <span style="color: var(--ma-blue);">MOVIE</span><span style="color: var(--amazon-orange);">'</span><span style="color: var(--yt-red);">S</span><span style="color: var(--goog-blue);"> </span><span style="color: var(--goog-green);">ANYWHERE</span>
+    </h1>
+    <p style="color: #888; text-transform: uppercase; letter-spacing: 3px; font-size: 0.7rem;">Your Universal Digital Cinema Collection</p>
+
+    <div id="movie-container">Syncing Multi-Platform Library...</div>
 
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv';
@@ -146,10 +158,9 @@
             return clean + '?v=' + Date.now();
         }
 
-        // NEW: Logic to hide the button entirely if no URL exists
         function createLink(url, label, className) {
             if (!url || url === "N/A" || url.trim() === "" || url.toLowerCase().includes("no")) {
-                return ''; // Returns nothing, effectively removing the box
+                return ''; 
             }
             return `<a href="${url}" target="_blank" class="btn ${className}">${label}</a>`;
         }
