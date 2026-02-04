@@ -6,9 +6,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie's Anywhere | Universal Wide Hub</title>
+    <title>Movie's Anywhere | Universal Hub</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" crossorigin="anonymous"></script>
 
     <style>
         :root {
@@ -21,84 +21,65 @@
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: var(--bg-main);
             color: #ffffff;
             margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 🛠️ UNIVERSAL WIDE GRID: 90% Box Size for Ultra-Wide/TV */
+        /* 🛠️ UNIVERSAL WIDE GRID: 90% Box Size for Ultra-Wide */
         #movie-container {
             width: 90% !important; 
             max-width: 2800px; 
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
             gap: 20px;
-            margin-top: 30px;
             margin-bottom: 60px;
         }
 
         .description-text {
-            width: 90%;
-            max-width: 1000px;
-            text-align: center;
-            color: #888;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 10px auto 30px auto;
-            display: block;
+            width: 90%; max-width: 1000px; text-align: center; color: #888;
+            font-size: 1rem; line-height: 1.6; margin: 10px auto 20px auto;
+        }
+
+        .search-wrapper {
+            width: 90%; max-width: 600px; margin: 20px 0;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        #movie-search {
+            width: 100%; padding: 12px 25px; border-radius: 30px; border: 2px solid #333;
+            background: #151515; color: white; font-size: 1rem; outline: none;
+            -webkit-appearance: none;
         }
 
         .movie-card {
             background: linear-gradient(145deg, #1e1e1e, #111111);
-            border: 1px solid #333;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            border: 1px solid #333; border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
             transition: all 0.3s ease;
         }
 
-        .movie-card:hover { transform: translateY(-8px); border-color: var(--ma-blue); }
-
-        .poster-box {
-            width: 100%;
-            aspect-ratio: 2/3;
-            background-color: #000;
-        }
-
-        .poster {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .card-content { padding: 12px; text-align: center; background: #141414; }
-
-        .title {
-            font-size: 0.85rem; font-weight: bold; margin-bottom: 12px;
-            min-height: 2.5rem; display: flex; align-items: center; justify-content: center;
-        }
-
+        .poster-box { width: 100%; aspect-ratio: 2/3; background-color: #000; }
+        .poster { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .card-content { padding: 10px; text-align: center; background: #141414; }
+        .title { font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; min-height: 2.5rem; display: flex; align-items: center; justify-content: center; }
+        
         .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .btn { padding: 7px 1px; text-decoration: none; border-radius: 4px; font-size: 0.65rem; font-weight: 800; color: white; text-align: center; text-transform: uppercase; }
+        
+        .btn-amazon { background: #ff9900; color: #000; }
+        .btn-google { background: var(--goog-blue); }
+        .btn-youtube { background: #ff0000; }
+        .btn-ma { background: var(--ma-blue); }
 
-        .btn {
-            padding: 7px 1px; text-decoration: none; border-radius: 4px;
-            font-size: 0.65rem; font-weight: 800; color: white; text-align: center;
-            text-transform: uppercase;
-        }
-
-        .btn-amazon { background: linear-gradient(to bottom, #ff9900, #e47911); color: #000; }
-        .btn-google { background: linear-gradient(to bottom, var(--goog-blue), #3b78db); }
-        .btn-youtube { background: linear-gradient(to bottom, #ff0000, #cc0000); }
-        .btn-ma { background: linear-gradient(to bottom, var(--ma-blue), #007acc); }
-
-        /* 📱 MOBILE STACKING FIX */
         @media (max-width: 768px) {
-            #movie-container { width: 95% !important; grid-template-columns: 1fr; gap: 30px; }
-            .description-text { font-size: 0.9rem; margin-bottom: 20px; }
+            #movie-container { width: 95% !important; grid-template-columns: repeat(2, 1fr); gap: 12px; }
             h1 { font-size: 2.2rem !important; }
+            .title { font-size: 0.75rem; min-height: 2rem; }
+            .btn { font-size: 0.55rem; padding: 5px 1px; }
         }
     </style>
 </head>
@@ -113,47 +94,54 @@
         If some of these don't have the Movie's Anywhere link then you'll have to buy it on Amazon or you can click on the google link or youtube to watch it
     </div>
 
-    <div id="movie-container">Direct-Linking Images...</div>
+    <div class="search-wrapper">
+        <label for="movie-search" style="margin-bottom:8px; font-size:0.75rem; color:#888;">SEARCH COLLECTION</label>
+        <input type="text" id="movie-search" placeholder="Filter by title..." onkeyup="filterCollection()">
+    </div>
+
+    <div id="movie-container">Direct-Linking Cinema Library...</div>
 
     <script>
-        // 🚀 SMART CACHE: Appending a timestamp to the CSV URL forces a fresh fetch from Google Sheets
+        let fullLibrary = [];
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
         const githubBase = 'https://raw.githubusercontent.com/KFruti88/Movies-Anywhere/main/images/';
 
-        function init() {
+        function universalInit() {
             Papa.parse(csvUrl, {
-                download: true, header: true,
+                download: true,
+                header: true,
+                skipEmptyLines: true,
                 complete: function(results) { 
-                    // Permanent A-Z Sort Logic
-                    let sortedData = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
-                    sortedData.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
-                    renderMovies(sortedData); 
+                    fullLibrary = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
+                    fullLibrary.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
+                    renderMovies(fullLibrary); 
                 }
             });
         }
 
-        function fixImageUrl(url) {
-            if (!url || url.trim() === "") return '';
-            let clean = url.trim();
-
-            // 1. If it's just a filename (no http), add the full GitHub path
-            if (!clean.startsWith('http')) {
-                clean = githubBase + clean;
-            }
-
-            // 2. UNIVERSAL GITHUB FIX: Force all GitHub URLs to use the raw delivery network
-            // This handles "github.com", "/blob/", and "/tree/" links automatically
-            clean = clean.replace('github.com', 'raw.githubusercontent.com')
-                         .replace('/blob/', '/')
-                         .replace('/tree/', '/');
-            
-            // 3. 🚀 SMART CACHE: Append a timestamp so changes show up instantly
-            return clean + '?v=' + Date.now();
+        function filterCollection() {
+            const val = document.getElementById('movie-search').value.toLowerCase();
+            const filtered = fullLibrary.filter(movie => movie['Movie Name'].toLowerCase().includes(val));
+            renderMovies(filtered);
         }
 
-        function createLink(url, label, className) {
-            if (!url || url === "N/A" || url.trim() === "" || url.toLowerCase().includes("no")) return ''; 
-            return `<a href="${url}" target="_blank" class="btn ${className}">${label}</a>`;
+        function fixImageUrl(url) {
+            if (!url) return '';
+            let clean = url.trim();
+            
+            // 1. If it's a standard GitHub URL, convert it to RAW
+            if (clean.includes('github.com')) {
+                clean = clean.replace('github.com', 'raw.githubusercontent.com')
+                             .replace('/blob/', '/')
+                             .replace('/tree/', '/');
+            } 
+            // 2. If it's just a filename, add the GitHub base
+            else if (!clean.startsWith('http')) {
+                clean = githubBase + clean;
+            }
+            
+            // 🚀 Force handshake reset with timestamp
+            return clean + (clean.includes('?') ? '&' : '?') + 'v=' + Date.now();
         }
 
         function renderMovies(data) {
@@ -165,7 +153,7 @@
                 card.className = 'movie-card';
                 card.innerHTML = `
                     <div class="poster-box">
-                        <img src="${fixImageUrl(row['Movie Image'])}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/000/fff?text=Check+Image+Path'">
+                        <img src="${fixImageUrl(row['Movie Image'])}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/000/fff?text=Check+Sheet'">
                     </div>
                     <div class="card-content">
                         <div class="title">${name}</div>
@@ -180,7 +168,13 @@
                 container.appendChild(card);
             });
         }
-        window.onload = init;
+
+        function createLink(url, label, className) {
+            if (!url || url === "N/A" || url.trim() === "" || url.toLowerCase().includes("no")) return ''; 
+            return `<a href="${url}" target="_blank" class="btn ${className}">${label}</a>`;
+        }
+
+        window.onload = function() { setTimeout(universalInit, 500); };
     </script>
 </body>
 </html>
