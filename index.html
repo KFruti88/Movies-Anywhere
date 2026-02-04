@@ -62,6 +62,7 @@
             transition: all 0.3s ease;
         }
 
+        .movie-card:hover { transform: translateY(-8px); border-color: var(--ma-blue); }
         .poster-box { width: 100%; aspect-ratio: 2/3; background-color: #000; }
         .poster { width: 100%; height: 100%; object-fit: cover; display: block; }
         .card-content { padding: 10px; text-align: center; background: #141414; }
@@ -96,13 +97,14 @@
 
     <div class="search-wrapper">
         <label for="movie-search" style="margin-bottom:8px; font-size:0.75rem; color:#888;">SEARCH COLLECTION</label>
-        <input type="text" id="movie-search" placeholder="Filter by title..." onkeyup="filterCollection()">
+        <input type="text" id="movie-search" placeholder="Type a title..." onkeyup="filterCollection()">
     </div>
 
     <div id="movie-container">Direct-Linking Cinema Library...</div>
 
     <script>
-        let fullLibrary = [];
+        // Renamed variable to prevent "Already Declared" syntax errors
+        let movieLibraryMaster = []; 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
         const githubBase = 'https://raw.githubusercontent.com/KFruti88/Movies-Anywhere/main/images/';
 
@@ -112,16 +114,16 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) { 
-                    fullLibrary = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
-                    fullLibrary.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
-                    renderMovies(fullLibrary); 
+                    movieLibraryMaster = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
+                    movieLibraryMaster.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
+                    renderMovies(movieLibraryMaster); 
                 }
             });
         }
 
         function filterCollection() {
             const val = document.getElementById('movie-search').value.toLowerCase();
-            const filtered = fullLibrary.filter(movie => movie['Movie Name'].toLowerCase().includes(val));
+            const filtered = movieLibraryMaster.filter(movie => movie['Movie Name'].toLowerCase().includes(val));
             renderMovies(filtered);
         }
 
@@ -129,18 +131,17 @@
             if (!url) return '';
             let clean = url.trim();
             
-            // 1. If it's a standard GitHub URL, convert it to RAW
+            // Fixes standard GitHub browser links to Raw content links
             if (clean.includes('github.com')) {
                 clean = clean.replace('github.com', 'raw.githubusercontent.com')
                              .replace('/blob/', '/')
                              .replace('/tree/', '/');
             } 
-            // 2. If it's just a filename, add the GitHub base
             else if (!clean.startsWith('http')) {
                 clean = githubBase + clean;
             }
             
-            // 🚀 Force handshake reset with timestamp
+            // Handshake reset for cross-browser caching (Opera/Chrome/Safari)
             return clean + (clean.includes('?') ? '&' : '?') + 'v=' + Date.now();
         }
 
@@ -174,6 +175,7 @@
             return `<a href="${url}" target="_blank" class="btn ${className}">${label}</a>`;
         }
 
+        // Safe delay for extension background reporting (fixes "Port Closed" errors)
         window.onload = function() { setTimeout(universalInit, 500); };
     </script>
 </body>
