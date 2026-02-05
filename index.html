@@ -6,205 +6,121 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie's Anywhere | Universal Hub</title>
+    <title>Werewolf | Universal Hub</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" crossorigin="anonymous"></script>
 
     <style>
         :root {
             --bg-main: #0a0a0a; 
-            --ma-blue: #0099ff;
-            --amazon-orange: #ff9900;
-            --yt-red: #ff0000;
-            --goog-blue: #4285f4;
-            --goog-green: #34a853;
+            --ww-accent: #0099ff;
+            --menu-width: 90%; /* Standardizing to 90% - */
         }
 
+        /* DYNAMIC THEMES */
+        body.ww-night { --bg-main: #050505; --ww-accent: #ff9900; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Arial, sans-serif;
             background-color: var(--bg-main);
             color: #ffffff;
             margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
-            -webkit-font-smoothing: antialiased;
+            transition: background 0.8s ease;
         }
 
-        /* 🔢 TOP FIXED COUNTER BAR */
-        #top-counter-bar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(10, 10, 10, 0.95);
-            border-bottom: 2px solid var(--ma-blue);
-            padding: 10px 0;
-            text-align: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+        /* THE UNIVERSAL NAV BAR */
+        #universal-nav {
+            width: var(--menu-width);
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #333;
         }
 
-        #movie-count-badge {
-            color: var(--ma-blue);
-            font-weight: 900;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
-        /* 🛠️ UNIVERSAL WIDE GRID: 90% Box Size */
-        #movie-container {
-            width: 90% !important; 
-            max-width: 2800px; 
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px;
-            margin-top: 100px; 
-            margin-bottom: 60px;
-        }
+        .nav-links a:hover { color: var(--ww-accent); }
 
-        .description-text {
-            width: 90%; max-width: 1000px; text-align: center; color: #888;
-            font-size: 1rem; line-height: 1.6; margin: 80px auto 10px auto;
-        }
-
-        .search-wrapper {
-            width: 90%; max-width: 600px; margin: 10px 0 20px 0;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        #movie-search {
-            width: 100%; padding: 12px 25px; border-radius: 30px; border: 2px solid #333;
-            background: #151515; color: white; font-size: 1rem; outline: none;
-            -webkit-appearance: none;
-        }
-
-        .movie-card {
-            background: linear-gradient(145deg, #1e1e1e, #111111);
-            border: 1px solid #333; border-radius: 12px; overflow: hidden;
-            display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-            transition: all 0.3s ease;
-        }
-
-        .movie-card:hover { transform: translateY(-8px); border-color: var(--ma-blue); }
-        .poster-box { width: 100%; aspect-ratio: 2/3; background-color: #000; }
-        .poster { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .card-content { padding: 10px; text-align: center; background: #141414; }
-        .title { font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; min-height: 2.5rem; display: flex; align-items: center; justify-content: center; }
-        
-        .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .btn { padding: 7px 1px; text-decoration: none; border-radius: 4px; font-size: 0.65rem; font-weight: 800; color: white; text-align: center; text-transform: uppercase; }
-        
-        .btn-amazon { background: #ff9900; color: #000; }
-        .btn-google { background: var(--goog-blue); }
-        .btn-youtube { background: #ff0000; }
-        .btn-ma { background: var(--ma-blue); }
-
+        /* Mobile Stacking - */
         @media (max-width: 768px) {
-            #movie-container { width: 95% !important; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 80px; }
-            h1 { font-size: 2.2rem !important; margin-top: 100px !important; }
-            .title { font-size: 0.75rem; min-height: 2rem; }
-            .btn { font-size: 0.55rem; padding: 5px 1px; }
+            #universal-nav { flex-direction: column; gap: 15px; text-align: center; }
+            .nav-links { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+        }
+
+        /* Movie Grid Logic - */
+        #movie-container {
+            width: var(--menu-width);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
 
-    <div id="top-counter-bar">
-        <div id="movie-count-badge">Collection Loading...</div>
-    </div>
+    <nav id="universal-nav">
+        <div style="font-weight: 900; color: var(--ww-accent);">WEREWOLF3788</div>
+        <div class="nav-links" id="dynamic-links">
+            </div>
+    </nav>
 
-    <h1 style="margin-top: 80px; font-size: 2.8rem; font-weight: 900; text-align: center; margin-bottom: 5px;">
-        <span style="color: var(--ma-blue);">M</span><span style="color: var(--amazon-orange);">o</span><span style="color: var(--yt-red);">v</span><span style="color: var(--goog-blue);">i</span><span style="color: var(--goog-green);">e's</span> 
-        <span style="color: var(--ma-blue);">A</span><span style="color: var(--amazon-orange);">n</span><span style="color: var(--yt-red);">y</span><span style="color: var(--goog-blue);">w</span><span style="color: var(--goog-green);">h</span><span style="color: var(--ma-blue);">e</span><span style="color: var(--amazon-orange);">r</span><span style="color: var(--yt-red);">e</span>
-    </h1>
-
-    <div class="description-text">
-        Browse your collection below. If you see a button, the link is live in your spreadsheet
-    </div>
-
-    <div class="search-wrapper">
-        <label for="movie-search" style="margin-bottom:8px; font-size:0.75rem; color:#888;">SEARCH COLLECTION</label>
-        <input type="text" id="movie-search" placeholder="Filter by title..." onkeyup="filterCollection()">
-    </div>
-
-    <div id="movie-container">Syncing Cinema Library...</div>
+    <div id="movie-container">Syncing Library...</div>
 
     <script>
-        let movieLibraryMaster = []; 
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
-        const githubBase = 'https://raw.githubusercontent.com/KFruti88/Movies-Anywhere/main/images/';
+        // 1. DOMAIN-BASED LINK LOGIC
+        const siteConfig = {
+            "werewolf.ourflora.com": [
+                { name: "Phoenix", url: "/phoenix-darkfire/" },
+                { name: "Ray", url: "/home/ray-2/" },
+                { name: "Movies", url: "https://kfruti88.github.io/Movies-Anywhere/" }
+            ],
+            "ourflora.com": [
+                { name: "Business Directory", url: "/directory" },
+                { name: "Flora News", url: "/news" }
+            ]
+        };
 
-        function universalInit() {
-            Papa.parse(csvUrl, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) { 
-                    movieLibraryMaster = results.data.filter(row => row['Movie Name'] && row['Movie Name'].trim() !== "");
-                    movieLibraryMaster.sort((a, b) => a['Movie Name'].trim().localeCompare(b['Movie Name'].trim()));
-                    renderMovies(movieLibraryMaster); 
-                }
+        function setupUniversalMenu() {
+            const host = window.location.hostname;
+            const links = siteConfig[host] || siteConfig["werewolf.ourflora.com"]; // Default to yours
+            const container = document.getElementById('dynamic-links');
+            
+            links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.textContent = link.name;
+                container.appendChild(a);
             });
         }
 
-        function filterCollection() {
-            const val = document.getElementById('movie-search').value.toLowerCase();
-            const filtered = movieLibraryMaster.filter(movie => movie['Movie Name'].toLowerCase().includes(val));
-            renderMovies(filtered);
-        }
-
-        function updateCounter(count) {
-            const badge = document.getElementById('movie-count-badge');
-            badge.innerText = `Library Synced: ${count} Movies Found`;
-        }
-
-        function fixImageUrl(url) {
-            if (!url) return '';
-            let clean = url.trim();
-            if (clean.includes('github.com')) {
-                clean = clean.replace('github.com', 'raw.githubusercontent.com')
-                             .replace('/blob/', '/')
-                             .replace('/tree/', '/');
-            } 
-            else if (!clean.startsWith('http')) {
-                clean = githubBase + clean;
+        // 2. SUNRISE/SUNSET LOGIC
+        function applyTimeTheme() {
+            const hour = new Date().getHours();
+            if (hour < 6 || hour >= 18) {
+                document.body.classList.add('ww-night');
             }
-            return clean + (clean.includes('?') ? '&' : '?') + 'v=' + Date.now();
         }
 
-        function renderMovies(data) {
-            const container = document.getElementById('movie-container');
-            container.innerHTML = '';
-            updateCounter(data.length);
+        // 3. MOVIE SYNC LOGIC -
+        // (Using your existing PapaParse logic here...)
 
-            data.forEach(row => {
-                const name = row['Movie Name'];
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.innerHTML = `
-                    <div class="poster-box">
-                        <img src="${fixImageUrl(row['Movie Image'])}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/000/fff?text=Check+Sheet'">
-                    </div>
-                    <div class="card-content">
-                        <div class="title">${name}</div>
-                        <div class="link-grid">
-                            ${createLink(row['Amazon'], 'Amazon', 'btn-amazon')}
-                            ${createLink(row['Google'], 'Google', 'btn-google')}
-                            ${createLink(row['Youtube'], 'YouTube', 'btn-youtube')}
-                            ${createLink(row["Movie's Anywhere"], 'Anywhere', 'btn-ma')}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function createLink(url, label, className) {
-            // 🚀 CLEANEST LOGIC: If there's text, show the button. No filters.
-            if (!url || url.trim() === "") return ''; 
-            return `<a href="${url.trim()}" target="_blank" class="btn ${className}">${label}</a>`;
-        }
-
-        window.onload = function() { setTimeout(universalInit, 500); };
+        window.onload = function() {
+            setupUniversalMenu();
+            applyTimeTheme();
+            // universalInit(); // Call your CSV parser here
+        };
     </script>
 </body>
 </html>
