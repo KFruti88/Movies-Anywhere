@@ -9,6 +9,7 @@
     <title>Movie's Anywhere | Universal Hub</title>
     
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" crossorigin="anonymous"></script>
 
     <style>
@@ -19,6 +20,7 @@
             --container-width: 90%; 
         }
 
+        /* 🌙 NIGHT MODE THEME */
         body.night-mode {
             --bg-main: #050505;
             --ma-blue: #ff9800;
@@ -33,6 +35,7 @@
             transition: all 0.8s ease-in-out;
         }
 
+        /* 🌍 UNIVERSAL GLOBE MENU */
         #universal-nav {
             width: var(--container-width);
             margin: 20px auto;
@@ -44,6 +47,7 @@
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(10px);
+            z-index: 1000;
         }
 
         .nav-links a {
@@ -54,6 +58,9 @@
             font-size: 0.85rem;
         }
 
+        .nav-links a:hover { color: var(--ma-blue); }
+
+        /* 🎬 MOVIE GRID */
         #movie-container {
             width: var(--container-width);
             display: grid;
@@ -68,8 +75,10 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #333;
+            transition: transform 0.3s ease;
         }
 
+        .movie-card:hover { transform: translateY(-5px); border-color: var(--ma-blue); }
         .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
 
         @media (max-width: 768px) {
@@ -91,9 +100,11 @@
     <div id="movie-container">Syncing Cinema Library...</div>
 
     <script>
+    (function() {
         // 🚀 SMART CACHE BUSTER: DYNAMIC CSV URL
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
 
+        // 1. DYNAMIC GLOBE MENU
         function loadMenu() {
             const menuConfig = {
                 "kfruti88.github.io": [
@@ -108,6 +119,8 @@
             const host = window.location.hostname;
             const links = menuConfig[host] || menuConfig["kfruti88.github.io"];
             const menuBox = document.getElementById('dynamic-menu');
+            
+            menuBox.innerHTML = '';
             links.forEach(link => {
                 const a = document.createElement('a');
                 a.href = link.url;
@@ -116,18 +129,24 @@
             });
         }
 
+        // 2. SUNRISE/SUNSET Logic
         function checkSun() {
             const hour = new Date().getHours();
-            if (hour < 6 || hour >= 18) document.body.classList.add('night-mode');
+            // Night mode between 6PM and 6AM
+            if (hour < 6 || hour >= 18) {
+                document.body.classList.add('night-mode');
+            }
         }
 
+        // 3. MOVIE RENDERING ENGINE
         function renderMovies(data) {
             const container = document.getElementById('movie-container');
             container.innerHTML = '';
+            
             data.forEach(movie => {
                 if(!movie['Movie Name'] || movie['Movie Name'].trim() === "") return;
                 
-                // 🚀 SMART CACHE BUSTER: FORCE IMAGE REFRESH
+                // 🚀 SMART CACHE BUSTER: IMAGE REFRESH
                 const freshImgUrl = movie['Movie Image'] + (movie['Movie Image'].includes('?') ? '&' : '?') + 'v=' + Date.now();
                 
                 const card = document.createElement('div');
@@ -148,15 +167,20 @@
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                complete: function(results) { renderMovies(results.data); }
+                complete: function(results) { 
+                    renderMovies(results.data); 
+                }
             });
         }
 
+        // 🛠️ SINGLE ONLOAD GATEKEEPER
         window.onload = () => {
             loadMenu();
             checkSun();
             initMovies();
+            console.log("Werewolf Hub: System Optimized & Cache Busted.");
         };
+    })();
     </script>
 </body>
 </html>
