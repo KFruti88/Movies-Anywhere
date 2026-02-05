@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie's Anywhere | Universal Hub</title>
     
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" crossorigin="anonymous"></script>
 
     <style>
@@ -21,7 +23,7 @@
             --container-width: 90%; 
         }
 
-        /* SUNSET / NIGHT MODE */
+        /* 🌙 SUNSET / NIGHT MODE (Toggled by JS) */
         body.night-mode {
             --bg-main: #050505;
             --ma-blue: #ff9800;
@@ -61,7 +63,7 @@
 
         .nav-links a:hover { color: var(--ma-blue); }
 
-        /* MOVIE GRID */
+        /* 🎬 MOVIE GRID */
         #movie-container {
             width: var(--container-width);
             display: grid;
@@ -95,10 +97,10 @@
             margin: 2px;
         }
 
-        /* Mobile View */
+        /* 📱 Mobile View (Stacked) */
         @media (max-width: 768px) {
-            #universal-nav { flex-direction: column; gap: 10px; }
-            .nav-links { margin: 0; }
+            #universal-nav { flex-direction: column; gap: 10px; text-align: center; }
+            .nav-links { display: flex; flex-direction: column; gap: 8px; margin: 0; }
             #movie-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
     </style>
@@ -117,7 +119,7 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv';
 
-        // 1. DYNAMIC MENU LOGIC
+        // 1. DYNAMIC GLOBE MENU LOGIC
         function loadMenu() {
             const menuConfig = {
                 "kfruti88.github.io": [
@@ -141,7 +143,7 @@
             });
         }
 
-        // 2. SUNRISE/SUNSET
+        // 2. SUNRISE/SUNSET (6 AM to 6 PM)
         function checkSun() {
             const hour = new Date().getHours();
             if (hour < 6 || hour >= 18) {
@@ -149,12 +151,12 @@
             }
         }
 
-        // 3. MOVIE RENDERING
+        // 3. MOVIE RENDERING ENGINE
         function renderMovies(data) {
             const container = document.getElementById('movie-container');
             container.innerHTML = '';
             data.forEach(movie => {
-                if(!movie['Movie Name']) return;
+                if(!movie['Movie Name'] || movie['Movie Name'].trim() === "") return;
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
@@ -172,17 +174,18 @@
             Papa.parse(csvUrl, {
                 download: true,
                 header: true,
+                skipEmptyLines: true,
                 complete: function(results) {
                     renderMovies(results.data);
                 }
             });
         }
 
-        // SINGLE ONLOAD GATEKEEPER
+        // 🛠️ MASTER INITIALIZATION
         window.onload = () => {
-            loadMenu();
-            checkSun();
-            initMovies();
+            loadMenu();    // Inject Globe Links
+            checkSun();    // Apply Day/Night Theme
+            initMovies();  // Sync and Render Movies
         };
     </script>
 </body>
