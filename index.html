@@ -9,21 +9,18 @@
     <title>Movie's Anywhere | Library</title>
     
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" crossorigin="anonymous"></script>
 
     <style>
         :root {
             --bg-main: #0a0a0a; 
             --ma-blue: #0099ff;
-            --amazon-orange: #ff9900;
             --container-width: 90%; 
         }
 
-        /* 🌙 NIGHT MODE THEME (6PM - 6AM) */
         body.night-mode {
             --bg-main: #050505;
-            --ma-blue: #ff9800; /* Flora Orange Adjust */
+            --ma-blue: #ff9800;
         }
 
         body {
@@ -32,17 +29,14 @@
             color: #ffffff;
             margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
-            transition: all 0.8s ease-in-out;
         }
 
-        /* 🎬 MOVIE GRID SETTINGS */
         #movie-container {
             width: var(--container-width);
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 20px;
-            margin-top: 40px;
-            margin-bottom: 50px;
+            margin: 40px 0;
         }
 
         .movie-card {
@@ -51,100 +45,69 @@
             overflow: hidden;
             border: 1px solid #333;
             transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
         }
 
-        .movie-card:hover { 
-            transform: translateY(-5px); 
-            border-color: var(--ma-blue); 
-        }
+        .movie-card:hover { transform: translateY(-5px); border-color: var(--ma-blue); }
+        .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
 
-        .poster { 
-            width: 100%; 
-            aspect-ratio: 2/3; 
-            object-fit: cover; 
-            display: block; 
-            background: #222;
-        }
-
-        /* Responsive Stacking for Mobile */
         @media (max-width: 768px) {
-            #movie-container { 
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 10px; 
-                width: 95%;
-            }
+            #movie-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="movie-container">Syncing Cinema Library...</div>
+    <div id="movie-container">Initialising Library...</div>
 
     <script>
     (function() {
-        // 🚀 SMART CACHE BUSTER: DYNAMIC CSV URL
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbnwK6U18P1u1eAS8a_PqZzpOKxQ9AATL6RBH7CfxXQR10YPM63akRqxSDbNiXYJWs92tvobh6iqE7/pub?output=csv' + '&v=' + Date.now();
 
-        // 1. SUNRISE/SUNSET Logic
-        function checkSun() {
-            const hour = new Date().getHours();
-            // Night mode between 6PM and 6AM
-            if (hour < 6 || hour >= 18) {
-                document.body.classList.add('night-mode');
-            }
-        }
-
-        // 2. MOVIE RENDERING ENGINE
         function renderMovies(data) {
             const container = document.getElementById('movie-container');
+            if (!data || data.length === 0) {
+                container.innerHTML = "No data found in spreadsheet.";
+                return;
+            }
+
             container.innerHTML = '';
             
             data.forEach(movie => {
-                // Ensure we have a Name and Image before rendering
-                if(!movie['Movie Name'] || movie['Movie Name'].trim() === "") return;
+                // Flexible header detection
+                const name = movie['Movie Name'] || movie['Name'] || movie['title'] || Object.values(movie)[1];
+                const img = movie['Movie Image'] || movie['Image'] || movie['Poster'] || Object.values(movie)[0];
+                const link = movie['Amazon'] || movie['Link'] || Object.values(movie)[2];
+
+                if(!name || name.toString().trim() === "") return;
                 
-                // 🚀 SMART CACHE BUSTER: IMAGE REFRESH
-                const imageUrl = movie['Movie Image'] || '';
-                const freshImgUrl = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                const freshImgUrl = img + (img.includes('?') ? '&' : '?') + 'v=' + Date.now();
                 
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
                     <img class="poster" src="${freshImgUrl}" onerror="this.src='https://placehold.co/200x300?text=No+Image'">
-                    <div style="padding:15px; text-align:center; flex-grow:1; display:flex; flex-direction:column; justify-content:space-between;">
-                        <div style="font-size:0.9rem; font-weight:bold; margin-bottom:10px;">${movie['Movie Name']}</div>
-                        <a href="${movie['Amazon']}" 
-                           style="display:block; padding:8px; background:var(--ma-blue); color:white; text-decoration:none; border-radius:4px; font-size:0.75rem; font-weight:bold;" 
-                           target="_blank">WATCH NOW</a>
+                    <div style="padding:15px; text-align:center;">
+                        <div style="font-size:0.9rem; font-weight:bold; margin-bottom:10px; height:2.5em; overflow:hidden;">${name}</div>
+                        <a href="${link}" style="display:block; padding:8px; background:var(--ma-blue); color:white; text-decoration:none; border-radius:4px; font-size:0.75rem; font-weight:bold;" target="_blank">WATCH NOW</a>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function initMovies() {
+        function init() {
             Papa.parse(csvUrl, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                complete: function(results) { 
-                    renderMovies(results.data); 
-                },
-                error: function(err) {
-                    console.error("CSV Loading Error:", err);
-                    document.getElementById('movie-container').innerHTML = "Error loading library. Please refresh.";
+                complete: function(results) {
+                    console.log("Data Received:", results.data[0]); // Debugging line
+                    renderMovies(results.data);
                 }
             });
         }
 
-        // 🛠️ INITIALIZE ON LOAD
-        window.onload = () => {
-            checkSun();
-            initMovies();
-            console.log("Movie Library: Active & Menu Removed.");
-        };
+        window.onload = init;
     })();
     </script>
 </body>
