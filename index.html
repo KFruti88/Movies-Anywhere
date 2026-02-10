@@ -30,42 +30,29 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 🔢 TOP FIXED COUNTER BAR */
         #top-counter-bar {
-            position: fixed;
-            top: 0;
-            width: 100%;
+            position: fixed; top: 0; width: 100%;
             background: rgba(10, 10, 10, 0.95);
             border-bottom: 2px solid var(--ma-blue);
-            padding: 10px 0;
-            text-align: center;
-            z-index: 1000;
+            padding: 10px 0; text-align: center; z-index: 1000;
             backdrop-filter: blur(5px);
         }
 
         #movie-count-badge {
-            color: var(--ma-blue);
-            font-weight: 900;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+            color: var(--ma-blue); font-weight: 900; font-size: 1.1rem;
             text-transform: uppercase;
         }
 
-        /* 🛠️ UNIVERSAL WIDE GRID: 90% Box Size */
         #movie-container {
             width: 90% !important; 
             max-width: 2800px; 
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
             gap: 20px;
-            margin-top: 40px; 
-            margin-bottom: 60px;
+            margin-top: 40px; margin-bottom: 60px;
         }
 
-        .description-text {
-            width: 90%; max-width: 1000px; text-align: center; color: #888;
-            font-size: 1rem; line-height: 1.6; margin: 120px auto 10px auto;
-        }
+        .header-section { margin-top: 120px; text-align: center; }
 
         .search-wrapper {
             width: 90%; max-width: 600px; margin: 10px 0 20px 0;
@@ -87,21 +74,20 @@
         .movie-card:hover { transform: translateY(-8px); border-color: var(--ma-blue); }
         .poster-box { width: 100%; aspect-ratio: 2/3; background-color: #000; }
         .poster { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
         .card-content { padding: 10px; text-align: center; background: #141414; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .title { font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; min-height: 2.5rem; display: flex; align-items: center; justify-content: center; }
         
         .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .btn { padding: 7px 1px; text-decoration: none; border-radius: 4px; font-size: 0.65rem; font-weight: 800; color: white; text-align: center; text-transform: uppercase; }
         
-        .btn-amazon { background: #ff9900; color: #000; }
+        .btn-amazon { background: var(--amazon-orange); color: #000; }
         .btn-google { background: var(--goog-blue); }
-        .btn-youtube { background: #ff0000; }
+        .btn-youtube { background: var(--yt-red); }
         .btn-ma { background: var(--ma-blue); }
 
         @media (max-width: 768px) {
-            #movie-container { width: 95% !important; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 30px; }
-            .title { font-size: 0.75rem; min-height: 2rem; }
-            .btn { font-size: 0.55rem; padding: 5px 1px; }
+            #movie-container { width: 95% !important; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         }
     </style>
 </head>
@@ -111,17 +97,14 @@
         <div id="movie-count-badge">Collection Loading...</div>
     </div>
 
-    <h1 style="margin-top: 100px; font-size: 2.8rem; font-weight: 900; text-align: center; margin-bottom: 5px;">
-        <span style="color: var(--ma-blue);">M</span><span style="color: var(--amazon-orange);">o</span><span style="color: var(--yt-red);">v</span><span style="color: var(--goog-blue);">i</span><span style="color: var(--goog-green);">e's</span> 
-        <span style="color: var(--ma-blue);">A</span><span style="color: var(--amazon-orange);">n</span><span style="color: var(--yt-red);">y</span><span style="color: var(--goog-blue);">w</span><span style="color: var(--goog-green);">h</span><span style="color: var(--ma-blue);">e</span><span style="color: var(--amazon-orange);">r</span><span style="color: var(--yt-red);">e</span>
-    </h1>
-
-    <div class="description-text">
-        Browse your collection below. If you see a button, the link is live in your spreadsheet.
+    <div class="header-section">
+        <h1 style="font-size: 2.8rem; font-weight: 900; margin-bottom: 5px;">
+            <span style="color: var(--ma-blue);">M</span><span style="color: var(--amazon-orange);">o</span><span style="color: var(--yt-red);">v</span><span style="color: var(--goog-blue);">i</span><span style="color: var(--goog-green);">e's</span> 
+            <span style="color: var(--ma-blue);">A</span><span style="color: var(--amazon-orange);">n</span><span style="color: var(--yt-red);">y</span><span style="color: var(--goog-blue);">w</span><span style="color: var(--goog-green);">h</span><span style="color: var(--ma-blue);">e</span><span style="color: var(--amazon-orange);">r</span><span style="color: var(--yt-red);">e</span>
+        </h1>
     </div>
 
     <div class="search-wrapper">
-        <label for="movie-search" style="margin-bottom:8px; font-size:0.75rem; color:#888;">SEARCH COLLECTION</label>
         <input type="text" id="movie-search" placeholder="Filter by title..." onkeyup="filterCollection()">
     </div>
 
@@ -138,74 +121,89 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) { 
-                    // Robust filtering: looking for any column that looks like 'Name' if 'Movie Name' fails
-                    movieLibraryMaster = results.data.filter(row => {
-                        const nameKey = row['Movie Name'] || row['Name'] || row['title'] || Object.values(row)[1];
-                        return nameKey && nameKey.toString().trim() !== "";
+                    movieLibraryMaster = results.data.map(row => {
+                        let newRow = {};
+                        for (let key in row) {
+                            newRow[key.trim().toLowerCase()] = row[key];
+                        }
+                        return newRow;
+                    }).filter(row => {
+                        const name = row['movie name'] || row['name'] || row['title'];
+                        return name && name.toString().trim() !== "";
                     });
 
                     movieLibraryMaster.sort((a, b) => {
-                        const nameA = (a['Movie Name'] || a['Name'] || Object.values(a)[1]).toString().trim();
-                        const nameB = (b['Movie Name'] || b['Name'] || Object.values(b)[1]).toString().trim();
+                        const nameA = (a['movie name'] || a['name'] || "").toString().toUpperCase();
+                        const nameB = (b['movie name'] || b['name'] || "").toString().toUpperCase();
                         return nameA.localeCompare(nameB);
                     });
 
                     renderMovies(movieLibraryMaster); 
-                },
-                error: function(err) {
-                    document.getElementById('movie-container').innerText = "Error Loading Library. Check if Spreadsheet is Published to Web.";
                 }
             });
         }
 
-        function filterCollection() {
-            const val = document.getElementById('movie-search').value.toLowerCase();
-            const filtered = movieLibraryMaster.filter(movie => {
-                const name = (movie['Movie Name'] || movie['Name'] || Object.values(movie)[1]).toString().toLowerCase();
-                return name.includes(val);
-            });
-            renderMovies(filtered);
-        }
-
-        function updateCounter(count) {
-            const badge = document.getElementById('movie-count-badge');
-            badge.innerText = `Library Synced: ${count} Movies Found`;
+        function getValidLink(row, keys) {
+            for (let key of keys) {
+                let val = row[key.toLowerCase()];
+                if (val) {
+                    let clean = val.toString().trim();
+                    if (clean !== "" && clean.toUpperCase() !== "N/A") {
+                        return clean;
+                    }
+                }
+            }
+            return null;
         }
 
         function fixImageUrl(row) {
-            let url = row['Movie Image'] || row['Image'] || row['Poster'] || Object.values(row)[0] || '';
-            let clean = url.toString().trim();
+            let val = row['movie image'] || row['image'] || row['poster'] || '';
+            let clean = val.toString().trim();
+            
+            if (clean === "" || clean.toUpperCase() === "N/A") {
+                return `https://placehold.co/400x600/1a1a1a/0099ff?text=Poster+Pending`;
+            }
+
+            // 🛠️ AUTOMATIC GITHUB FIX: Convert browser links to raw image links
             if (clean.includes('github.com')) {
                 clean = clean.replace('github.com', 'raw.githubusercontent.com')
                              .replace('/blob/', '/')
                              .replace('/tree/', '/');
             } 
-            else if (clean !== '' && !clean.startsWith('http')) {
+            // If it's just the filename, add the base
+            else if (!clean.startsWith('http')) {
                 clean = githubBase + clean;
             }
-            return clean === '' ? 'https://placehold.co/400x600/000/fff?text=No+Image' : clean + (clean.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            
+            return clean + (clean.includes('?') ? '&' : '?') + 'v=' + Date.now();
         }
 
         function renderMovies(data) {
             const container = document.getElementById('movie-container');
             container.innerHTML = '';
-            updateCounter(data.length);
+            document.getElementById('movie-count-badge').innerText = `Library Synced: ${data.length} Movies`;
 
             data.forEach(row => {
-                const name = row['Movie Name'] || row['Name'] || Object.values(row)[1];
+                const name = row['movie name'] || row['name'] || "Unknown Title";
+                
+                const amz = getValidLink(row, ['Amazon', 'Amazon Link', 'AMZ']);
+                const goo = getValidLink(row, ['Google', 'Google Play', 'Google Link']);
+                const yt = getValidLink(row, ['Youtube', 'YouTube Link', 'YT']);
+                const ma = getValidLink(row, ["Movie's Anywhere", "Movies Anywhere", "Anywhere", "MA"]);
+
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
                     <div class="poster-box">
-                        <img src="${fixImageUrl(row)}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/000/fff?text=Check+Sheet'">
+                        <img src="${fixImageUrl(row)}" alt="${name}" class="poster" onerror="this.src='https://placehold.co/400x600/1a1a1a/0099ff?text=Poster+Error'">
                     </div>
                     <div class="card-content">
                         <div class="title">${name}</div>
                         <div class="link-grid">
-                            ${createLink(row['Amazon'] || row['amazon'], 'Amazon', 'btn-amazon')}
-                            ${createLink(row['Google'] || row['google'], 'Google', 'btn-google')}
-                            ${createLink(row['Youtube'] || row['youtube'] || row['YouTube'], 'YouTube', 'btn-youtube')}
-                            ${createLink(row["Movie's Anywhere"] || row['Movies Anywhere'] || row['MA'], 'Anywhere', 'btn-ma')}
+                            ${amz ? `<a href="${amz}${amz.includes('?') ? '&' : '?'}tag=werewolf3788-20" target="_blank" class="btn btn-amazon">Amazon</a>` : ''}
+                            ${goo ? `<a href="${goo}" target="_blank" class="btn btn-google">Google</a>` : ''}
+                            ${yt ? `<a href="${yt}" target="_blank" class="btn btn-youtube">YouTube</a>` : ''}
+                            ${ma ? `<a href="${ma}" target="_blank" class="btn btn-ma">Anywhere</a>` : ''}
                         </div>
                     </div>
                 `;
@@ -213,9 +211,13 @@
             });
         }
 
-        function createLink(url, label, className) {
-            if (!url || url.toString().trim() === "" || url.toString().toUpperCase() === "N/A") return ''; 
-            return `<a href="${url.toString().trim()}" target="_blank" class="btn ${className}">${label}</a>`;
+        function filterCollection() {
+            const val = document.getElementById('movie-search').value.toLowerCase();
+            const filtered = movieLibraryMaster.filter(movie => {
+                const name = (movie['movie name'] || movie['name'] || "").toString().toLowerCase();
+                return name.includes(val);
+            });
+            renderMovies(filtered);
         }
 
         window.onload = function() { setTimeout(universalInit, 300); };
